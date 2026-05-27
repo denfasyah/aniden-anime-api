@@ -6,13 +6,15 @@ const userAgent =
 export async function wajikFetch(
   url: string,
   axiosConfig?: AxiosRequestConfig<any>,
-  callback?: (response: AxiosResponse) => void
+  callback?: (response: AxiosResponse) => void,
 ): Promise<any> {
   const response = await axios({
     url,
     headers: {
       ...axiosConfig?.headers,
       "User-Agent": userAgent,
+      Referer: "https://otakudesu.blog/", // Tambahkan ini
+      "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", // Tambahkan ini
     },
     ...axiosConfig,
   });
@@ -26,13 +28,15 @@ export async function wajikFetch(
 
 export async function getFinalUrl(
   url: string,
-  axiosConfig?: AxiosRequestConfig<any>
+  axiosConfig?: AxiosRequestConfig<any>,
 ): Promise<any> {
   const response = await axios.head(url, {
     ...axiosConfig,
     headers: {
       ...axiosConfig?.headers,
       "User-Agent": userAgent,
+      Referer: "https://otakudesu.blog/", // Tambahkan ini
+      "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", // Tambahkan ini
     },
     maxRedirects: 0,
     validateStatus: function (status) {
@@ -55,7 +59,7 @@ export async function getFinalUrls(
       retries?: number;
       delay?: number;
     };
-  }
+  },
 ): Promise<any[]> {
   const { retries = 3, delay = 1000 } = config.retryConfig || {};
 
