@@ -6,6 +6,7 @@ const mainRoute = express.Router();
 
 mainRoute.get("/", mainController.getMainView);
 mainRoute.get("/view-data", serverCache(), mainController.getMainViewData);
+mainRoute.get("/api/proxy", mainController.getProxyData);
 mainRoute.get("*", mainController._404);
 
 export default mainRoute;

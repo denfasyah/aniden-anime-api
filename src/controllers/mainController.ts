@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { setResponseError } from "@helpers/error";
 import { otakudesuInfo } from "@otakudesu/index";
 import { samehadakuInfo } from "@samehadaku/index";
+import { wajikFetch } from "@services/dataFetcher";
 import generatePayload from "@helpers/payload";
 import path from "path";
 import fs from "fs";
@@ -55,6 +56,31 @@ const mainController = {
 
       res.json(generatePayload(res, { data }));
     } catch (error) {
+      next(error);
+    }
+  },
+
+  async getProxyData(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { url } = req.query;
+      if (!url || typeof url !== "string") {
+        res.status(400).json({
+          status: "failed",
+          statusCode: 400,
+          message: "Parameter 'url' is required as a query string.",
+        });
+        return;
+      }
+
+      console.log(`[Proxy Middleware] Proxying client request for URL: ${url}`);
+      const data = await wajikFetch(url);
+      
+      if (typeof data === "object") {
+        res.json(data);
+      } else {
+        res.send(data);
+      }
+    } catch (error: any) {
       next(error);
     }
   },
