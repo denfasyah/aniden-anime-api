@@ -77,8 +77,8 @@ async function getPublicProxies(): Promise<string[]> {
   try {
     console.log("[Proxy Rotator] Fetching fresh public proxy list...");
     const response = await axios.get(
-      "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=5000&country=all&ssl=all&anonymity=all",
-      { timeout: 5000 }
+      "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=2500&country=all&ssl=all&anonymity=all",
+      { timeout: 2500 }
     );
     if (response.data && typeof response.data === "string") {
       const proxies = response.data
@@ -189,7 +189,7 @@ export async function wajikFetch(
   // 4. Public Proxy (Rotator with Auto-Retry)
   if (provider === "public") {
     const proxies = await getPublicProxies();
-    const retries = Math.min(5, proxies.length);
+    const retries = Math.min(3, proxies.length); // Try up to 3 times to prevent long hanging
     let lastError: any = null;
 
     // Shuffle a slice of proxies to avoid picking the exact same one under concurrent loads
@@ -205,7 +205,7 @@ export async function wajikFetch(
         const requestConfig: AxiosRequestConfig = {
           url,
           method: axiosConfig?.method || "GET",
-          timeout: 6000, // Short timeout to fail-over fast if proxy is dead
+          timeout: 2500, // Short timeout to fail-over fast if proxy is dead
           headers: baseHeaders,
           proxy: {
             protocol: "http",
@@ -319,7 +319,7 @@ export async function getFinalUrl(
           const [host, portStr] = proxyStr.split(":");
           const port = parseInt(portStr || "80", 10);
           response = await axios.head(url, {
-            timeout: 5000,
+            timeout: 2500,
             headers: baseHeaders,
             maxRedirects: 5,
             validateStatus: (status) => status >= 200 && status < 400,
