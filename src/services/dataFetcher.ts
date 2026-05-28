@@ -1,7 +1,9 @@
 import axios, { type AxiosResponse, type AxiosRequestConfig } from "axios";
+import https from "https"; // Tambahkan ini
 
 const userAgent =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+const httpsAgent = new https.Agent({ keepAlive: true });
 
 export async function wajikFetch(
   url: string,
@@ -9,15 +11,28 @@ export async function wajikFetch(
   callback?: (response: AxiosResponse) => void,
 ): Promise<any> {
   const response = await axios({
-    url,
-    headers: {
-      ...axiosConfig?.headers,
-      "User-Agent": userAgent,
-      Referer: "https://otakudesu.blog/", // Tambahkan ini
-      "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", // Tambahkan ini
-    },
-    ...axiosConfig,
-  });
+  //   url,
+  //   headers: {
+  //     ...axiosConfig?.headers,
+  //     "User-Agent": userAgent,
+  //     Referer: "https://otakudesu.blog/", // Tambahkan ini
+  //     "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", // Tambahkan ini
+  //   },
+  //   ...axiosConfig,
+  // });
+  url,
+      method: 'GET',
+      httpsAgent,
+      timeout: 10000, // Penting: Jangan biarkan request menggantung selamanya
+      headers: {
+        ...axiosConfig?.headers,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://otakudesu.blog/",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+      },
+      ...axiosConfig,
+    });
 
   if (callback) callback(response);
 
@@ -32,16 +47,26 @@ export async function getFinalUrl(
 ): Promise<any> {
   const response = await axios.head(url, {
     ...axiosConfig,
+  //   headers: {
+  //     ...axiosConfig?.headers,
+  //     "User-Agent": userAgent,
+  //     Referer: "https://otakudesu.blog/", // Tambahkan ini
+  //     "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", // Tambahkan ini
+  //   },
+  //   maxRedirects: 0,
+  //   validateStatus: function (status) {
+  //     return status >= 200 && status < 400;
+  //   },
+  // });
+  httpsAgent,
+    timeout: 8000,
     headers: {
       ...axiosConfig?.headers,
       "User-Agent": userAgent,
-      Referer: "https://otakudesu.blog/", // Tambahkan ini
-      "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", // Tambahkan ini
+      "Referer": "https://otakudesu.blog/",
     },
-    maxRedirects: 0,
-    validateStatus: function (status) {
-      return status >= 200 && status < 400;
-    },
+    maxRedirects: 5, // Izinkan beberapa redirect
+    validateStatus: (status) => status >= 200 && status < 400,
   });
 
   const location = response.headers["location"];
