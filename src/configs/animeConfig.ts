@@ -3,7 +3,7 @@ const animeConfig = {
 
   baseUrl: {
     otakudesu: "https://otakudesu.blog",
-    samehadaku: "https://samehadaku.email",
+    samehadaku: "https://samehadaku.care",
   },
 
   response: {

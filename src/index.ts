@@ -8,7 +8,7 @@ import path from "path";
 import express from "express";
 import cors from "cors";
 
-const PORT = process.env.PORT || animeConfig.PORT || 3001;
+const { PORT } = animeConfig;
 const app = express();
 
 // MIDDLEWARES
